@@ -1,21 +1,53 @@
-// Відстежуй на формі подію input, і щоразу записуй у локальне сховище об'єкт з полями email і message, у яких зберігай поточні значення полів форми. Нехай ключем для сховища буде рядок "feedback-form-state".
-// Під час завантаження сторінки перевіряй стан сховища, і якщо там є збережені дані, заповнюй ними поля форми.В іншому випадку поля повинні бути порожніми.
-// Під час сабміту форми очищуй сховище і поля форми, а також виводь у консоль об'єкт з полями email, message та їхніми поточними значеннями.
-// Зроби так, щоб сховище оновлювалось не частіше, ніж раз на 500 мілісекунд.Для цього додай до проекту і використовуй бібліотеку lodash.throttle.
-
 import throttle from "lodash.throttle";
 
-const elForm = document.querySelector(".feedback-form");
-elForm.addEventListener('input', throttle(handlerFeedbackForm), 500);
+// Знаходимо форму та її поля
+const form = document.querySelector(".feedback-form");
+const emailInput = form.querySelector('[name="email"]');
+const messageInput = form.querySelector('[name="message"]');
+// Отримуємо ключ для збереження у локальному сховищі
+const LS_KEY = "feedback-form-state";
 
+// Прослуховуємо форму через "input" а також через "submit"
+form.addEventListener('input', throttle(handlerFeedbackForm), 500);
+form.addEventListener('submit', hendlerSubmit);
 
-const inputValue = "feedback-form-state";
+loadValueLocalStorage();
 
-function handlerFeedbackForm(evt) {
-    evt.preventDefault();
-    // console.log(evt.currentTarget.elements);
-    const { email, message } = evt.currentTarget.elements
-    // console.log("Email", 
-    // console.log("Message", message.value);
+// Отримуєм значення полів і записуєм в "LS"
+function handlerFeedbackForm() {
+    const formData = {
+        email: emailInput.value,
+        message: messageInput.value,
+    };
+
+    localStorage.setItem(LS_KEY, JSON.stringify(formData));
 };
+
+// Завантажуємо дані зі сховища та заповнюємо поля форми
+function loadValueLocalStorage() {
+    const formData = JSON.parse(localStorage.getItem(LS_KEY));
+
+    if (formData) {
+        emailInput.value = formData.email || '';
+        messageInput.value = formData.message || '';
+    };
+};
+
+// Очищуємо сховище та поля форми після сабміту
+function hendlerSubmit(evt) {
+    evt.preventDefault();
+
+    const formData = {
+        email: emailInput.value,
+        message: messageInput.value,
+    };
+
+    console.log(formData);
+
+    localStorage.removeItem(LS_KEY);
+    emailInput.value = '';
+    messageInput.value = '';
+};
+
+
 
