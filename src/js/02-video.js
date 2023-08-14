@@ -18,13 +18,17 @@ function saveCurrentTime(currentTime) {
     localStorage.setItem(LOCAL_STORAGE_KEY, currentTime);
 }
 
-// Отримуємо поточний час відтворення і зберігаємо його у локальному сховищі
-player.getCurrentTime().then(function (currentTime) {
-    saveCurrentTime(currentTime);
-});
+// Отримуємо збережений час відтворення зі сховища
+const savedTime = localStorage.getItem(LOCAL_STORAGE_KEY);
+
+if (savedTime) {
+    // Відтворюємо відео зі збереженого часу
+    player.setCurrentTime(savedTime).then(function () {
+        player.play();
+    });
+}
 
 // Отримуємо заголовок відео
 player.getVideoTitle().then(function (title) {
     console.log('Video title:', title);
 });
-
